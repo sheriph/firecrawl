@@ -104,6 +104,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      nuq-postgres:
+        condition: service_healthy
     ports:
       - "${PORT:-3002}:${INTERNAL_PORT:-3002}"
     command: node dist/src/harness.js --start-docker
@@ -156,6 +158,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     logging:
       driver: "json-file"
       options:
